@@ -20,7 +20,7 @@ namespace CustomMultiplayerMaps
     public static class ModBuildInfo
     {
         public const string Name = "CustomMultiplayerMaps";
-        public const string Version = "1.4.2";
+        public const string Version = "1.4.3";
     }
 
     public class main : MelonMod
@@ -72,10 +72,8 @@ namespace CustomMultiplayerMaps
             CustomMultiplayerMaps.GetFromFile();
             CustomMultiplayerMaps.ModSaved += Save;
             UI.instance.UI_Initialized += UIInit;
-            enabled = (bool)CustomMultiplayerMaps.Settings[0].SavedValue;
-            customMapFile = (string)CustomMultiplayerMaps.Settings[2].SavedValue;
-            randomCustomMap = (bool)CustomMultiplayerMaps.Settings[3].SavedValue;
-
+            Save();
+            Calls.onMapInitialized += SceneInit;
         }
 
         public void Save()
@@ -292,7 +290,6 @@ namespace CustomMultiplayerMaps
             if (!initialized && (currentScene == "Gym"))
             {
                 PhotonNetwork.NetworkingClient.EventReceived += (Action<EventData>)OnEvent;
-                Calls.onMapInitialized += SceneInit;
                 Calls.onModStringRecieved += ModsReceived;
                 mapsParent = new GameObject();
                 mapsParent.name = "CustomMultiplayerMaps";
@@ -690,7 +687,7 @@ namespace CustomMultiplayerMaps
             groundCollider = shape.AddComponent<GroundCollider>();
             groundCollider.isMainGroundCollider = true;
             groundCollider.collider = meshCollider;
-            mapParent.transform.position = new Vector3(0, 1.5f, 0);
+            mapParent.transform.position = new Vector3(0, 2.5f, 0);
             mapParent.transform.rotation = Quaternion.Euler(0, 90f, 0);
             mapParent.SetActive(false);
         }
@@ -2756,7 +2753,7 @@ namespace CustomMultiplayerMaps
             groundCollider = shape.AddComponent<GroundCollider>();
             groundCollider.isMainGroundCollider = true;
             groundCollider.collider = meshCollider;
-            mapParent.transform.position = new Vector3(0, 1.5f, 0);
+            mapParent.transform.position = new Vector3(0, 3.5f, 0);
             mapParent.SetActive(false);
         }
 
@@ -4411,11 +4408,13 @@ namespace CustomMultiplayerMaps
             Component.Destroy(shape.GetComponent<CapsuleCollider>());
             shape.GetComponent<Renderer>().material.shader = urp;
             shape.GetComponent<Renderer>().material.color = new Color(0.09999997f, 0.09999997f, 0.09999997f);
-            shape.layer = 9;
             shape.transform.parent = mapParent.transform;
             shape.transform.position = new Vector3(0f, -6.5f, 0f);
             shape.transform.rotation = Quaternion.Euler(-0f, 0f, 0f);
             shape.transform.localScale = new Vector3(60f, 0.1f, 60f);
+            shape.AddComponent<KillPlayerOnCollision>();
+            shape.layer = 10;
+            shape.AddComponent<KillStructureOnImpact>();
             meshCollider = shape.AddComponent<MeshCollider>();
             groundCollider = shape.AddComponent<GroundCollider>();
             groundCollider.isMainGroundCollider = true;
@@ -11627,6 +11626,7 @@ namespace CustomMultiplayerMaps
             shape.transform.position = new Vector3(0f, -5.3915567f, 0f);
             shape.transform.rotation = Quaternion.Euler(-0f, 0f, 0f);
             shape.transform.localScale = new Vector3(34.15132f, 0.87331146f, 50.461742f);
+            mapParent.transform.position = new Vector3(0, 0.6f, 0);
             mapParent.SetActive(false);
         }
 
