@@ -10,6 +10,7 @@ using MelonLoader;
 using RumbleModdingAPI;
 using RumbleModUI;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -20,7 +21,7 @@ namespace CustomMultiplayerMaps
     public static class ModBuildInfo
     {
         public const string Name = "CustomMultiplayerMaps";
-        public const string Version = "1.4.3";
+        public const string Version = "1.4.4";
     }
 
     public class main : MelonMod
@@ -40,6 +41,7 @@ namespace CustomMultiplayerMaps
         public static string customMapFile;
         public bool EventSent = false;
         public bool randomCustomMap;
+        private bool sendingMap = false, loadingMap = false;
 
         public static void Log(string msg)
         {
@@ -95,15 +97,42 @@ namespace CustomMultiplayerMaps
                 string recievedString = eventData.CustomData.ToString();
                 string[] processedString = recievedString.Split('|');
                 Log("69 - in: " + eventData.CustomData.ToString()); // make sure to use CustomData
+                if (sendingMap)
+                {
+                    Log("Got Multiple Sends - Stopped them");
+                    return;
+                }
+                sendingMap = true;
+                MelonCoroutines.Start(turnOffSendingMap());
                 ProcessEventCode69(processedString);
             }
             else if (eventData.Code == myEventCode2)
             {
                 string recievedString = eventData.CustomData.ToString();
                 string[] processedString = recievedString.Split('|');
+                if (loadingMap)
+                {
+                    Log("Got Multiple Loads :(");
+                }
+                loadingMap = true;
+                MelonCoroutines.Start(turnOffLoadingMap());
                 Log("70 - in: " + eventData.CustomData.ToString()); // make sure to use CustomData
                 ProcessEventCode70(processedString);
             }
+        }
+
+        private IEnumerator turnOffSendingMap()
+        {
+            yield return new WaitForSeconds(3);
+            sendingMap = false;
+            yield break;
+        }
+
+        private IEnumerator turnOffLoadingMap()
+        {
+            yield return new WaitForSeconds(3);
+            loadingMap = false;
+            yield break;
         }
 
         public void ProcessEventCode69(string[] processedString)
@@ -287,20 +316,17 @@ namespace CustomMultiplayerMaps
                     mapsParent.transform.GetChild(i).gameObject.SetActive(false);
                 }
             }
-            if (!initialized && (currentScene == "Gym"))
-            {
-                PhotonNetwork.NetworkingClient.EventReceived += (Action<EventData>)OnEvent;
-                Calls.onModStringRecieved += ModsReceived;
-                mapsParent = new GameObject();
-                mapsParent.name = "CustomMultiplayerMaps";
-                GameObject.DontDestroyOnLoad(mapsParent);
-            }
         }
 
         public void SceneInit()
         {
             if (!initialized)
             {
+                PhotonNetwork.NetworkingClient.EventReceived += (Action<EventData>)OnEvent;
+                Calls.onModStringRecieved += ModsReceived;
+                mapsParent = new GameObject();
+                mapsParent.name = "CustomMultiplayerMaps";
+                GameObject.DontDestroyOnLoad(mapsParent);
                 PreLoadMaps();
                 initialized = true;
                 Log("Initialized");
@@ -3948,7 +3974,7 @@ namespace CustomMultiplayerMaps
             shape = GameObject.CreatePrimitive(PrimitiveType.Cube);
             Component.Destroy(shape.GetComponent<BoxCollider>());
             shape.GetComponent<Renderer>().material.shader = urp;
-            shape.GetComponent<Renderer>().material.color = new Color(0f, 0f, 1f);
+            shape.GetComponent<Renderer>().material.color = new Color(0f, 0f, 0.5f);;
             shape.layer = 9;
             shape.transform.parent = mapParent.transform;
             shape.transform.position = new Vector3(-4.7683716E-07f, -1f, -5.0000005f);
@@ -3961,7 +3987,7 @@ namespace CustomMultiplayerMaps
             shape = GameObject.CreatePrimitive(PrimitiveType.Cube);
             Component.Destroy(shape.GetComponent<BoxCollider>());
             shape.GetComponent<Renderer>().material.shader = urp;
-            shape.GetComponent<Renderer>().material.color = new Color(1f, 0f, 0f);
+            shape.GetComponent<Renderer>().material.color = new Color(0.5f, 0f, 0f);;
             shape.layer = 9;
             shape.transform.parent = mapParent.transform;
             shape.transform.position = new Vector3(1.9073486E-06f, 1.55f, 15.000002f);
@@ -3974,7 +4000,7 @@ namespace CustomMultiplayerMaps
             shape = GameObject.CreatePrimitive(PrimitiveType.Cube);
             Component.Destroy(shape.GetComponent<BoxCollider>());
             shape.GetComponent<Renderer>().material.shader = urp;
-            shape.GetComponent<Renderer>().material.color = new Color(0f, 0f, 1f);
+            shape.GetComponent<Renderer>().material.color = new Color(0f, 0f, 0.5f);;
             shape.layer = 9;
             shape.transform.parent = mapParent.transform;
             shape.transform.position = new Vector3(-1.9073486E-06f, 1.55f, -15.000002f);
@@ -3986,7 +4012,7 @@ namespace CustomMultiplayerMaps
             groundCollider.collider = meshCollider;
             shape = GameObject.CreatePrimitive(PrimitiveType.Cube);
             shape.GetComponent<Renderer>().material.shader = urp;
-            shape.GetComponent<Renderer>().material.color = new Color(1f, 0f, 0f);
+            shape.GetComponent<Renderer>().material.color = new Color(0.5f, 0f, 0f);;
             shape.layer = 9;
             shape.transform.parent = mapParent.transform;
             shape.transform.position = new Vector3(9.536743E-07f, 0.25f, 10.000001f);
@@ -3998,7 +4024,7 @@ namespace CustomMultiplayerMaps
             groundCollider.collider = meshCollider;
             shape = GameObject.CreatePrimitive(PrimitiveType.Cube);
             shape.GetComponent<Renderer>().material.shader = urp;
-            shape.GetComponent<Renderer>().material.color = new Color(0f, 0f, 1f);
+            shape.GetComponent<Renderer>().material.color = new Color(0f, 0f, 0.5f);;
             shape.layer = 9;
             shape.transform.parent = mapParent.transform;
             shape.transform.position = new Vector3(-9.536743E-07f, 0.25f, -10.000001f);
@@ -4010,7 +4036,7 @@ namespace CustomMultiplayerMaps
             groundCollider.collider = meshCollider;
             shape = GameObject.CreatePrimitive(PrimitiveType.Cube);
             shape.GetComponent<Renderer>().material.shader = urp;
-            shape.GetComponent<Renderer>().material.color = new Color(0f, 0f, 1f);
+            shape.GetComponent<Renderer>().material.color = new Color(0f, 0f, 0.5f);;
             shape.layer = 9;
             shape.transform.parent = mapParent.transform;
             shape.transform.position = new Vector3(-1.9073486E-06f, 4f, -20.000002f);
@@ -4022,7 +4048,7 @@ namespace CustomMultiplayerMaps
             groundCollider.collider = meshCollider;
             shape = GameObject.CreatePrimitive(PrimitiveType.Cube);
             shape.GetComponent<Renderer>().material.shader = urp;
-            shape.GetComponent<Renderer>().material.color = new Color(1f, 0f, 0f);
+            shape.GetComponent<Renderer>().material.color = new Color(0.5f, 0f, 0f);;
             shape.layer = 9;
             shape.transform.parent = mapParent.transform;
             shape.transform.position = new Vector3(1.9073486E-06f, 4f, 20.000002f);
@@ -4034,7 +4060,7 @@ namespace CustomMultiplayerMaps
             groundCollider.collider = meshCollider;
             shape = GameObject.CreatePrimitive(PrimitiveType.Cube);
             shape.GetComponent<Renderer>().material.shader = urp;
-            shape.GetComponent<Renderer>().material.color = new Color(0f, 0f, 1f);
+            shape.GetComponent<Renderer>().material.color = new Color(0f, 0f, 0.5f);;
             shape.layer = 9;
             shape.transform.parent = mapParent.transform;
             shape.transform.position = new Vector3(10f, 4f, -10.025002f);
@@ -4047,7 +4073,7 @@ namespace CustomMultiplayerMaps
             shape = GameObject.CreatePrimitive(PrimitiveType.Cube);
             Component.Destroy(shape.GetComponent<BoxCollider>());
             shape.GetComponent<Renderer>().material.shader = urp;
-            shape.GetComponent<Renderer>().material.color = new Color(1f, 0f, 0f);
+            shape.GetComponent<Renderer>().material.color = new Color(0.5f, 0f, 0f);;
             shape.layer = 9;
             shape.transform.parent = mapParent.transform;
             shape.transform.position = new Vector3(4.7683716E-07f, -1f, 5.0000005f);
@@ -4059,7 +4085,7 @@ namespace CustomMultiplayerMaps
             groundCollider.collider = meshCollider;
             shape = GameObject.CreatePrimitive(PrimitiveType.Cube);
             shape.GetComponent<Renderer>().material.shader = urp;
-            shape.GetComponent<Renderer>().material.color = new Color(1f, 0f, 0f);
+            shape.GetComponent<Renderer>().material.color = new Color(0.5f, 0f, 0f);;
             shape.layer = 9;
             shape.transform.parent = mapParent.transform;
             shape.transform.position = new Vector3(10.000002f, 4f, 10.024999f);
@@ -4071,7 +4097,7 @@ namespace CustomMultiplayerMaps
             groundCollider.collider = meshCollider;
             shape = GameObject.CreatePrimitive(PrimitiveType.Cube);
             shape.GetComponent<Renderer>().material.shader = urp;
-            shape.GetComponent<Renderer>().material.color = new Color(1f, 0f, 0f);
+            shape.GetComponent<Renderer>().material.color = new Color(0.5f, 0f, 0f);;
             shape.layer = 9;
             shape.transform.parent = mapParent.transform;
             shape.transform.position = new Vector3(-10f, 4f, 10.025002f);
@@ -4083,7 +4109,7 @@ namespace CustomMultiplayerMaps
             groundCollider.collider = meshCollider;
             shape = GameObject.CreatePrimitive(PrimitiveType.Cube);
             shape.GetComponent<Renderer>().material.shader = urp;
-            shape.GetComponent<Renderer>().material.color = new Color(0f, 0f, 1f);
+            shape.GetComponent<Renderer>().material.color = new Color(0f, 0f, 0.5f);;
             shape.layer = 9;
             shape.transform.parent = mapParent.transform;
             shape.transform.position = new Vector3(-10.000002f, 4f, -10.024999f);
@@ -4095,7 +4121,7 @@ namespace CustomMultiplayerMaps
             groundCollider.collider = meshCollider;
             shape = GameObject.CreatePrimitive(PrimitiveType.Cube);
             shape.GetComponent<Renderer>().material.shader = urp;
-            shape.GetComponent<Renderer>().material.color = new Color(0f, 1f, 0f);
+            shape.GetComponent<Renderer>().material.color = new Color(0f, 0.5f, 0f);;
             shape.layer = 9;
             shape.transform.parent = mapParent.transform;
             shape.transform.position = new Vector3(0f, 0.055000007f, 0f);
@@ -4108,7 +4134,7 @@ namespace CustomMultiplayerMaps
             shape = GameObject.CreatePrimitive(PrimitiveType.Cube);
             Component.Destroy(shape.GetComponent<BoxCollider>());
             shape.GetComponent<Renderer>().material.shader = urp;
-            shape.GetComponent<Renderer>().material.color = new Color(1f, 0f, 0f);
+            shape.GetComponent<Renderer>().material.color = new Color(0.5f, 0f, 0f);;
             shape.layer = 9;
             shape.transform.parent = mapParent.transform;
             shape.transform.position = new Vector3(0f, -7f, 500f);
@@ -4121,7 +4147,7 @@ namespace CustomMultiplayerMaps
             shape = GameObject.CreatePrimitive(PrimitiveType.Cube);
             Component.Destroy(shape.GetComponent<BoxCollider>());
             shape.GetComponent<Renderer>().material.shader = urp;
-            shape.GetComponent<Renderer>().material.color = new Color(0f, 0f, 1f);
+            shape.GetComponent<Renderer>().material.color = new Color(0f, 0f, 0.5f);;
             shape.layer = 9;
             shape.transform.parent = mapParent.transform;
             shape.transform.position = new Vector3(0f, -7f, -500f);
@@ -4131,6 +4157,118 @@ namespace CustomMultiplayerMaps
             groundCollider = shape.AddComponent<GroundCollider>();
             groundCollider.isMainGroundCollider = true;
             groundCollider.collider = meshCollider;
+            shape = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            shape.name = "Cube (Visible)";
+            Component.Destroy(shape.GetComponent<BoxCollider>());
+            shape.GetComponent<Renderer>().material.shader = urp;
+            shape.GetComponent<Renderer>().material.color = new Color(0.2636f, 0f, 0f);
+            shape.layer = 9;
+            meshCollider = shape.AddComponent<MeshCollider>();
+            groundCollider = shape.AddComponent<GroundCollider>();
+            groundCollider.isMainGroundCollider = true;
+            groundCollider.collider = meshCollider;
+            shape.transform.parent = mapParent.transform;
+            shape.transform.position = new Vector3(0f, 1.57f, 9.9827f);
+            shape.transform.rotation = Quaternion.Euler(0f, 90f, 0f);
+            shape.transform.localScale = new Vector3(0.1f, 0.1f, 20f);
+            shape = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            shape.name = "Cube (Visible)";
+            Component.Destroy(shape.GetComponent<BoxCollider>());
+            shape.GetComponent<Renderer>().material.shader = urp;
+            shape.GetComponent<Renderer>().material.color = new Color(0f, 0f, 0.2636f);
+            shape.layer = 9;
+            meshCollider = shape.AddComponent<MeshCollider>();
+            groundCollider = shape.AddComponent<GroundCollider>();
+            groundCollider.isMainGroundCollider = true;
+            groundCollider.collider = meshCollider;
+            shape.transform.parent = mapParent.transform;
+            shape.transform.position = new Vector3(0f, 1.57f, -9.9827f);
+            shape.transform.rotation = Quaternion.Euler(0f, 90f, 0f);
+            shape.transform.localScale = new Vector3(0.1f, 0.1f, 20f);
+            shape = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            shape.name = "Cube (Visible)";
+            Component.Destroy(shape.GetComponent<BoxCollider>());
+            shape.GetComponent<Renderer>().material.shader = urp;
+            shape.GetComponent<Renderer>().material.color = new Color(0f, 0f, 0.26359996f);
+            shape.layer = 9;
+            meshCollider = shape.AddComponent<MeshCollider>();
+            groundCollider = shape.AddComponent<GroundCollider>();
+            groundCollider.isMainGroundCollider = true;
+            groundCollider.collider = meshCollider;
+            shape.transform.parent = mapParent.transform;
+            shape.transform.position = new Vector3(10f, 8.9609f, -10f);
+            shape.transform.rotation = Quaternion.Euler(-0f, 0f, 0f);
+            shape.transform.localScale = new Vector3(0.15f, 0.1f, 20f);
+            shape = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            shape.name = "Cube (Visible)";
+            Component.Destroy(shape.GetComponent<BoxCollider>());
+            shape.GetComponent<Renderer>().material.shader = urp;
+            shape.GetComponent<Renderer>().material.color = new Color(0.26359996f, 0f, 0f);
+            shape.layer = 9;
+            meshCollider = shape.AddComponent<MeshCollider>();
+            groundCollider = shape.AddComponent<GroundCollider>();
+            groundCollider.isMainGroundCollider = true;
+            groundCollider.collider = meshCollider;
+            shape.transform.parent = mapParent.transform;
+            shape.transform.position = new Vector3(0f, 8.9609f, 20f);
+            shape.transform.rotation = Quaternion.Euler(-0f, 90f, -0f);
+            shape.transform.localScale = new Vector3(0.15f, 0.1f, 20f);
+            shape = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            shape.name = "Cube (Visible)";
+            Component.Destroy(shape.GetComponent<BoxCollider>());
+            shape.GetComponent<Renderer>().material.shader = urp;
+            shape.GetComponent<Renderer>().material.color = new Color(0f, 0f, 0.26359996f);
+            shape.layer = 9;
+            meshCollider = shape.AddComponent<MeshCollider>();
+            groundCollider = shape.AddComponent<GroundCollider>();
+            groundCollider.isMainGroundCollider = true;
+            groundCollider.collider = meshCollider;
+            shape.transform.parent = mapParent.transform;
+            shape.transform.position = new Vector3(0f, 8.9609f, -20f);
+            shape.transform.rotation = Quaternion.Euler(-0f, 90f, -0f);
+            shape.transform.localScale = new Vector3(0.15f, 0.1f, 20f);
+            shape = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            shape.name = "Cube (Visible)";
+            Component.Destroy(shape.GetComponent<BoxCollider>());
+            shape.GetComponent<Renderer>().material.shader = urp;
+            shape.GetComponent<Renderer>().material.color = new Color(0f, 0f, 0.26359996f);
+            shape.layer = 9;
+            meshCollider = shape.AddComponent<MeshCollider>();
+            groundCollider = shape.AddComponent<GroundCollider>();
+            groundCollider.isMainGroundCollider = true;
+            groundCollider.collider = meshCollider;
+            shape.transform.parent = mapParent.transform;
+            shape.transform.position = new Vector3(-10f, 8.9609f, -10f);
+            shape.transform.rotation = Quaternion.Euler(-0f, 0f, 0f);
+            shape.transform.localScale = new Vector3(0.15f, 0.1f, 20f);
+            shape = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            shape.name = "Cube (Visible)";
+            Component.Destroy(shape.GetComponent<BoxCollider>());
+            shape.GetComponent<Renderer>().material.shader = urp;
+            shape.GetComponent<Renderer>().material.color = new Color(0.26359996f, 0f, 0f);
+            shape.layer = 9;
+            meshCollider = shape.AddComponent<MeshCollider>();
+            groundCollider = shape.AddComponent<GroundCollider>();
+            groundCollider.isMainGroundCollider = true;
+            groundCollider.collider = meshCollider;
+            shape.transform.parent = mapParent.transform;
+            shape.transform.position = new Vector3(10f, 8.9609f, 10f);
+            shape.transform.rotation = Quaternion.Euler(-0f, 0f, 0f);
+            shape.transform.localScale = new Vector3(0.15f, 0.1f, 20f);
+            shape = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            shape.name = "Cube (Visible)";
+            Component.Destroy(shape.GetComponent<BoxCollider>());
+            shape.GetComponent<Renderer>().material.shader = urp;
+            shape.GetComponent<Renderer>().material.color = new Color(0.26359996f, 0f, 0f);
+            shape.layer = 9;
+            meshCollider = shape.AddComponent<MeshCollider>();
+            groundCollider = shape.AddComponent<GroundCollider>();
+            groundCollider.isMainGroundCollider = true;
+            groundCollider.collider = meshCollider;
+            shape.transform.parent = mapParent.transform;
+            shape.transform.position = new Vector3(-10f, 8.9609f, 10f);
+            shape.transform.rotation = Quaternion.Euler(-0f, 0f, 0f);
+            shape.transform.localScale = new Vector3(0.15f, 0.1f, 20f);
             mapParent.SetActive(false);
         }
 

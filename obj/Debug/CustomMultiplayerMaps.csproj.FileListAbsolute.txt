@@ -37,7 +37,6 @@ C:\Users\austi\source\repos\CustomMultiplayerMaps\CustomMultiplayerMaps\bin\Debu
 C:\Users\austi\source\repos\CustomMultiplayerMaps\CustomMultiplayerMaps\bin\Debug\Il2CppSmartLocalization.dll
 C:\Users\austi\source\repos\CustomMultiplayerMaps\CustomMultiplayerMaps\bin\Debug\Unity.RenderPipelines.Core.Runtime.dll
 C:\Users\austi\source\repos\CustomMultiplayerMaps\CustomMultiplayerMaps\bin\Debug\UnityEngine.UIModule.dll
-C:\Users\austi\source\repos\CustomMultiplayerMaps\CustomMultiplayerMaps\bin\Debug\Il2CppRUMBLE.Rendering.dll
 C:\Users\austi\source\repos\CustomMultiplayerMaps\CustomMultiplayerMaps\bin\Debug\Il2CppPhotonVoice.dll
 C:\Users\austi\source\repos\CustomMultiplayerMaps\CustomMultiplayerMaps\bin\Debug\Il2CppRUMBLE.Platform.dll
 C:\Users\austi\source\repos\CustomMultiplayerMaps\CustomMultiplayerMaps\bin\Debug\Il2CppRUMBLE.Platform.Info.Steam.dll
