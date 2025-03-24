@@ -21,7 +21,7 @@ namespace CustomMultiplayerMaps
     public static class ModBuildInfo
     {
         public const string Name = "CustomMultiplayerMaps";
-        public const string Version = "1.4.4";
+        public const string Version = "1.4.5";
     }
 
     public class main : MelonMod
@@ -291,12 +291,16 @@ namespace CustomMultiplayerMaps
         {
             string myMaps = GetEnabledMapsString();
             List<int> availableMaps = new List<int>();
-            for (int i = 0; i < opponentsMaps.Length; i++)
+            for (int i = 0; i < myMaps.Length; i++)
             {
-                if ((myMaps.Substring(i, 1) == "1") && (opponentsMaps.Substring(i, 1) == "1"))
+                try
                 {
-                    availableMaps.Add(i);
+                    if ((myMaps.Substring(i, 1) == "1") && (opponentsMaps.Substring(i, 1) == "1"))
+                    {
+                        availableMaps.Add(i);
+                    }
                 }
+                catch { }
             }
             if (availableMaps.Count == 0)
             {
