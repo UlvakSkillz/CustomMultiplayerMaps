@@ -21,14 +21,14 @@ namespace CustomMultiplayerMaps
     public static class ModBuildInfo
     {
         public const string Name = "CustomMultiplayerMaps";
-        public const string Version = "1.4.5";
+        public const string Version = "1.4.6";
     }
 
     public class main : MelonMod
     {
         public string currentScene = "";
-        public byte myEventCode = 69;
-        public byte myEventCode2 = 70;
+        public byte myEventCodeIn = 13;
+        public byte myEventCodeOut = 14;
         public static RaiseEventOptions eventOptions = new RaiseEventOptions() { Receivers = ReceiverGroup.Others, CachingOption = EventCaching.AddToRoomCache };
         public static RaiseEventOptions eventOptions2 = new RaiseEventOptions() { Receivers = ReceiverGroup.All, CachingOption = EventCaching.AddToRoomCache }; // ReceiverGroup.Others for only others | ReceiverGroup.All for everyone
         public System.Random random = new System.Random();
@@ -92,11 +92,11 @@ namespace CustomMultiplayerMaps
 
         public void OnEvent(EventData eventData)
         {
-            if (enabled && (eventData.Code == myEventCode))
+            if (enabled && (eventData.Code == myEventCodeIn))
             {
                 string recievedString = eventData.CustomData.ToString();
                 string[] processedString = recievedString.Split('|');
-                Log("69 - in: " + eventData.CustomData.ToString()); // make sure to use CustomData
+                Log(eventData.Code + " - in: " + eventData.CustomData.ToString()); // make sure to use CustomData
                 if (sendingMap)
                 {
                     Log("Got Multiple Sends - Stopped them");
@@ -104,9 +104,9 @@ namespace CustomMultiplayerMaps
                 }
                 sendingMap = true;
                 MelonCoroutines.Start(turnOffSendingMap());
-                ProcessEventCode69(processedString);
+                ProcessEventCodeIn(processedString);
             }
-            else if (eventData.Code == myEventCode2)
+            else if (eventData.Code == myEventCodeOut)
             {
                 string recievedString = eventData.CustomData.ToString();
                 string[] processedString = recievedString.Split('|');
@@ -116,8 +116,8 @@ namespace CustomMultiplayerMaps
                 }
                 loadingMap = true;
                 MelonCoroutines.Start(turnOffLoadingMap());
-                Log("70 - in: " + eventData.CustomData.ToString()); // make sure to use CustomData
-                ProcessEventCode70(processedString);
+                Log(eventData.Code + " - in: " + eventData.CustomData.ToString()); // make sure to use CustomData
+                ProcessEventCodeOut(processedString);
             }
         }
 
@@ -135,7 +135,7 @@ namespace CustomMultiplayerMaps
             yield break;
         }
 
-        public void ProcessEventCode69(string[] processedString)
+        public void ProcessEventCodeIn(string[] processedString)
         {
             if ((processedString[0] == "1") && ((bool)CustomMultiplayerMaps.Settings[1].SavedValue == true))
             {
@@ -190,7 +190,7 @@ namespace CustomMultiplayerMaps
                     }
                     for (int i = 0; i < sentString.Count; i++)
                     {
-                        PhotonNetwork.RaiseEvent(myEventCode2, sentString[i], eventOptions2, SendOptions.SendReliable);
+                        PhotonNetwork.RaiseEvent(myEventCodeOut, sentString[i], eventOptions2, SendOptions.SendReliable);
                     }
                 }
                 catch
@@ -199,7 +199,7 @@ namespace CustomMultiplayerMaps
                     string selectedMap = "0|" + SelectRandomMap(processedString[1]);
                     if (selectedMap != "0|-1")
                     {
-                        PhotonNetwork.RaiseEvent(myEventCode2, selectedMap, eventOptions2, SendOptions.SendReliable); // sends enabled with the event code of 70
+                        PhotonNetwork.RaiseEvent(myEventCodeOut, selectedMap, eventOptions2, SendOptions.SendReliable); // sends enabled with the event code of 70
                     }
                 }
             }
@@ -208,7 +208,7 @@ namespace CustomMultiplayerMaps
                 string selectedMap = "0|" + SelectRandomMap(processedString[1]);
                 if (selectedMap != "0|-1")
                 {
-                    PhotonNetwork.RaiseEvent(myEventCode2, selectedMap, eventOptions2, SendOptions.SendReliable); // sends enabled with the event code of 70
+                    PhotonNetwork.RaiseEvent(myEventCodeOut, selectedMap, eventOptions2, SendOptions.SendReliable); // sends enabled with the event code of 70
                 }
             }
         }
@@ -233,7 +233,7 @@ namespace CustomMultiplayerMaps
             }
         }
 
-        public void ProcessEventCode70(string[] processedString)
+        public void ProcessEventCodeOut(string[] processedString)
         {
             if (processedString[0] == "1")
             {
@@ -273,7 +273,7 @@ namespace CustomMultiplayerMaps
             {
                 sentString += "|" + text;
             }
-            PhotonNetwork.RaiseEvent(myEventCode2, sentString, eventOptions2, SendOptions.SendReliable);
+            PhotonNetwork.RaiseEvent(myEventCodeOut, sentString, eventOptions2, SendOptions.SendReliable);
         }
 
         public string selectRandomCustomMap()
@@ -284,7 +284,7 @@ namespace CustomMultiplayerMaps
 
         public void TestEvent69()
         {
-            PhotonNetwork.RaiseEvent(myEventCode, ModBuildInfo.Version + " | 1|" + GetEnabledMapsString(), eventOptions2, SendOptions.SendReliable);
+            PhotonNetwork.RaiseEvent(myEventCodeIn, ModBuildInfo.Version + " | 1|" + GetEnabledMapsString(), eventOptions2, SendOptions.SendReliable);
         }
 
         public string SelectRandomMap(string opponentsMaps)
@@ -355,7 +355,7 @@ namespace CustomMultiplayerMaps
                 {
                     useCustom = "0";
                 }
-                PhotonNetwork.RaiseEvent(myEventCode, useCustom + "|" + GetEnabledMapsString(), eventOptions, SendOptions.SendReliable); // sends randomMap all other players with the event code of 69
+                PhotonNetwork.RaiseEvent(myEventCodeIn, useCustom + "|" + GetEnabledMapsString(), eventOptions, SendOptions.SendReliable); // sends randomMap all other players with the event code of 69
             }
         }
 
