@@ -21,7 +21,7 @@ namespace CustomMultiplayerMaps
     public static class ModBuildInfo
     {
         public const string Name = "CustomMultiplayerMaps";
-        public const string Version = "1.4.6";
+        public const string Version = "1.5.0";
     }
 
     public class main : MelonMod
@@ -193,7 +193,7 @@ namespace CustomMultiplayerMaps
                         PhotonNetwork.RaiseEvent(myEventCodeOut, sentString[i], eventOptions2, SendOptions.SendReliable);
                     }
                 }
-                catch
+                catch (Exception e)
                 {
                     Error("Failed to read Custom Map: " + tempCustomMap);
                     string selectedMap = "0|" + SelectRandomMap(processedString[1]);
@@ -257,8 +257,9 @@ namespace CustomMultiplayerMaps
             PoolManager.instance.ResetPools(AssetType.Structure);
         }
 
-        public void TestEvent70()
+        public void TestEventIn()
         {
+            Log("Testing In");
             string[] fileText;
             if (randomCustomMap)
             {
@@ -266,7 +267,14 @@ namespace CustomMultiplayerMaps
             }
             else
             {
+                Log("Checking Text Ending: " + customMapFile);
+                if (!customMapFile.EndsWith(".txt"))
+                {
+                    customMapFile += ".txt";
+                }
+                Log("Added .txt?: " + customMapFile);
                 fileText = File.ReadAllLines(@"UserData\CustomMultiplayerMaps\Maps\" + customMapFile);
+                Log("File Read");
             }
             string sentString = "1";
             foreach (string text in fileText)
@@ -274,15 +282,17 @@ namespace CustomMultiplayerMaps
                 sentString += "|" + text;
             }
             PhotonNetwork.RaiseEvent(myEventCodeOut, sentString, eventOptions2, SendOptions.SendReliable);
+            Log("Event Sent out: " + sentString);
+            ProcessEventCodeIn(sentString.Split('|'));
         }
-
+        
         public string selectRandomCustomMap()
         {
             string[] fileEntries = Directory.GetFiles(@"UserData\CustomMultiplayerMaps\Maps");
             return fileEntries[random.Next(0, fileEntries.Length)];
         }
 
-        public void TestEvent69()
+        public void TestEventOut()
         {
             PhotonNetwork.RaiseEvent(myEventCodeIn, ModBuildInfo.Version + " | 1|" + GetEnabledMapsString(), eventOptions2, SendOptions.SendReliable);
         }
