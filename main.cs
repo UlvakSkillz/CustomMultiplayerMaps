@@ -21,7 +21,7 @@ namespace CustomMultiplayerMaps
     public static class ModBuildInfo
     {
         public const string Name = "CustomMultiplayerMaps";
-        public const string Version = "1.5.0";
+        public const string Version = "1.5.1";
     }
 
     public class main : MelonMod
@@ -388,12 +388,12 @@ namespace CustomMultiplayerMaps
 
         public void UnLoadMap0()
         {
-            Calls.GameObjects.Map0.Map0Production.GetGameObject().SetActive(false);
+            Calls.GameObjects.Map0.Map0production.GetGameObject().SetActive(false);
         }
 
         public void UnLoadMap1()
         {
-            Calls.GameObjects.Map1.Map1Production.GetGameObject().SetActive(false);
+            Calls.GameObjects.Map1.Map1production.GetGameObject().SetActive(false);
             Calls.GameObjects.Map1.Logic.SceneProcessors.GetGameObject().SetActive(false);
         }
 
